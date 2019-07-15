@@ -44,24 +44,23 @@ Markoff Chaney- - - -84557 views`
 
 ## Day with more than 1% error rate SQL query
 Views:
-`CREATE VIEW daily_errors as
-SELECT to_char(log.time, 'FMMonth DD, YYYY') "day", count(log.status) as errors
-FROM log WHERE status = '404 NOT FOUND'
-GROUP BY 1 ORDER BY 1;
+`CREATE VIEW errors as
+SELECT CAST(log.time as DATE) AS date_error, COUNT(log.status) as errors
+FROM log WHERE status LIKE '%404%' GROUP BY date_error;
         
-CREATE VIEW daily_requests as
-SELECT to_char(log.time, 'FMMonth DD, YYYY') "day", count(log.status) as requests
-FROM log GROUP BY 1 ORDER BY 1;
+CREATE VIEW requests as
+SELECT CAST(log.time as DATE) AS date_request, COUNT(log.status) as requests
+FROM log GROUP BY date_request;
         
-CREATE VIEW error_day as
-SELECT daily_errors.day, concat(ROUND((100.0 * daily_errors.errors / daily_requests.requests), 2), '%') as percent_errors
-FROM daily_errors, daily_requests
-WHERE daily_errors.day = daily_requests.day AND (((100.0 * daily_errors.errors / daily_requests.requests)) > 1)
-ORDER BY percent_errors desc;`
+CREATE VIEW result as
+SELECT errors.date_error, ROUND((100.0 * errors.errors / requests.requests), 3) as percent_errors
+FROM errors INNER JOIN requests ON errors.date_error = requests.date_request
+WHERE (((100.0 * errors.errors / requests.requests)) > 1)
+ORDER BY percent_errors DESC;`
 
 Query:
-`SELECT * FROM error_day;`
+`SELECT TO_CHAR(result.date_error, 'Mon DD, YYYY'), result.percent_errors FROM result;`
 
 Output:
 `Day in which the output rate was higher than 1%:
-July 17, 2016- - - -2.26% errors`
+July 17, 2016- - - -2.263% errors`

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import psycopg2
 
 
@@ -37,14 +39,14 @@ def popular_articles():
 # Outputs the days on which the error rate was above 1%
 def errors():
     db = psycopg2.connect("dbname=news")
-    query = "SELECT * FROM error_day;"
+    query = "SELECT TO_CHAR(result.date_error, 'Mon DD, YYYY'), result.percent_errors FROM result;"
     cursor = db.cursor()
     cursor.execute(query)
     posts = cursor.fetchall()
     db.close()
     print("Day in which the output rate was higher than 1%:")
     for date, percent in posts:
-        print(str(date) + "- - - -" + str(percent) + " errorsa")
+        print(str(date) + "- - - -" + str(percent) + "% errors")
     print('\n')
 
 
