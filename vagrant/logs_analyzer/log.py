@@ -7,7 +7,8 @@ import psycopg2
 def popular_authors():
     db = psycopg2.connect("dbname=news")
     query = "SELECT name, count(substr(log.path,10)) as views " \
-            "FROM authors INNER JOIN articles ON articles.author = authors.id " \
+            "FROM authors INNER JOIN articles " \
+            "ON articles.author = authors.id " \
             "INNER JOIN log ON articles.slug = substr(log.path,10) " \
             "WHERE log.path != '/' GROUP BY name ORDER BY views DESC;"
     cursor = db.cursor()
@@ -24,7 +25,8 @@ def popular_authors():
 def popular_articles():
     db = psycopg2.connect("dbname=news")
     query = "SELECT title, count(substr(log.path,10)) as views " \
-            "FROM articles INNER JOIN log ON articles.slug = substr(log.path,10) " \
+            "FROM articles INNER JOIN log " \
+            "ON articles.slug = substr(log.path,10) " \
             "WHERE log.path != '/' GROUP BY title ORDER BY views DESC LIMIT 3;"
     cursor = db.cursor()
     cursor.execute(query)
@@ -39,7 +41,8 @@ def popular_articles():
 # Outputs the days on which the error rate was above 1%
 def errors():
     db = psycopg2.connect("dbname=news")
-    query = "SELECT TO_CHAR(result.date_error, 'Mon DD, YYYY'), result.percent_errors FROM result;"
+    query = "SELECT TO_CHAR(result.date_error, 'Mon DD, YYYY'), " \
+            "result.percent_errors FROM result;"
     cursor = db.cursor()
     cursor.execute(query)
     posts = cursor.fetchall()
