@@ -18,7 +18,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/vagrant/logs_analyzer/log.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
+            <state relative-caret-position="660">
               <caret line="44" column="13" selection-start-line="44" selection-start-column="13" selection-end-line="44" selection-end-column="13" />
             </state>
           </provider>
@@ -119,12 +119,12 @@
       <option name="presentableId" value="Default" />
       <updated>1563077941034</updated>
       <workItem from="1563077948633" duration="2226000" />
-      <workItem from="1563176927176" duration="3267000" />
+      <workItem from="1563176927176" duration="3504000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5445000" />
+    <option name="totallyTimeSpent" value="5682000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -168,7 +168,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/vagrant/logs_analyzer/log.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
+        <state relative-caret-position="660">
           <caret line="44" column="13" selection-start-line="44" selection-start-column="13" selection-end-line="44" selection-end-column="13" />
         </state>
       </provider>
