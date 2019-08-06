@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>{{ restaurant.name }}</h1>
+        <ul>
+            {% for item in items %}
+            <li>{{item.name}}</li>
+            {% endfor %}
+        </ul>
+        <a href="{{url_for('newMenuItem', restaurant_id = restaurant.id)}}">Add</a>
+    </body>
+</html>
