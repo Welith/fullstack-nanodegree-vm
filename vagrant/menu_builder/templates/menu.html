@@ -1,12 +1,28 @@
 <!DOCTYPE html>
 <html>
-    <body>
-        <h1>{{ restaurant.name }}</h1>
-        <ul>
-            {% for item in items %}
-            <li>{{item.name}}</li>
-            {% endfor %}
-        </ul>
-        <a href="{{url_for('newMenuItem', restaurant_id = restaurant.id)}}">Add</a>
-    </body>
+
+<body>
+    <h1>{{ restaurant.name }}</h1>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+
+    <ul>
+        {% for message in messages %}
+        <li><strong>{{message}}</strong></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <ul>
+        {% for item in items %}
+        <li>{{item.name}} <a
+                href="{{url_for('editMenuItem', restaurant_id = restaurant.id, menu_id = item.id)}}">Edit</a>
+            <a href="{{url_for('deleteMenuItem', restaurant_id = restaurant.id, menu_id = item.id)}}">Edit</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="{{url_for('newMenuItem', restaurant_id = restaurant.id)}}">Add</a>
+</body>
+
 </html>
