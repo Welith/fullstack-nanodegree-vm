@@ -98,58 +98,6 @@ def deleteItem(restaurant_id, item_id):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/restaurants/<int:restaurant_id>/new/', methods=["POST", "GET"])
-def newMenuItem(restaurant_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    if request.method == "POST":
-        newItem = MenuItem(
-            name=request.form['name'], restaurant_id=restaurant_id)
-        session.add(newItem)
-        session.commit()
-        flash('Menu Item ADded')
-        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
-    elif request.method == "GET":
-        return render_template('newMenuItem.html', restaurant_id=restaurant_id)
-
-# Task 2: Create route for editMenuItem function here
-
-# Task 3: Create a route for deleteMenuItem function here
-
-
-@app.route('/restaurants/<int:restaurant_id>/delete/<int:menu_id>', methods=["POST", "GET"])
-def deleteMenuItem(restaurant_id, menu_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    currItem = session.query(MenuItem).filter_by(id=menu_id).one()
-    if request.method == "POST":
-        session.delete(currItem)
-        session.commit()
-        flash('Menu Item deleted')
-        return redirect(url_for('restaurantMenu', restaurant_id=restaurant_id))
-    elif request.method == "GET":
-        return render_template('deleteMenuItem.html', restaurant_id=restaurant_id, menu_id=menu_id, curr_item=currItem)
-
-
-@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON')
-def restaurantMenuItemJSON(restaurant_id, menu_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    item = session.query(MenuItem).filter_by(id=menu_id).one()
-    return jsonify(MenuItem=item.serialize)
-
-
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True

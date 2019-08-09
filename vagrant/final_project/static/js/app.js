@@ -1,38 +1,45 @@
 $(document).ready(function () {
     // Restaurant ajaxes
-    $('#editRes_').on('click', function (e) {
-        var id = $('#editRes_').data('id'), name = $('name').val();
+    var resId = $('#mainEditButton').data('id'), resName = $('#mainEditButton').data('name'),
+        formAction = $('#mainEditButton').data('action');
+    $('#editModalLabel').html('Edit Restaurant ' + resName);
+    $('#editForm').attr('action', formAction);
+    $('#name').attr('placeholder', resName);
+    $('#editRes').on('click', function (e) {
         e.preventDefault();
         $.ajax({
-            url: "/restaurants/" + id + "/edit",
+            url: "/restaurants/" + resId + "/edit",
             method: 'post',
-            data: $('.form-signin').serialize(),
+            data: $('#editForm').serialize(),
             success: function () {
                 console.log('Success')
-                location.reload()
+                //location.reload()
             },
-            error: function() {
+            error: function () {
                 console.log('Error')
             }
         });
     });
-    $('#deleteRes_').on('click', function (e) {
-        var id = $('#deleteRes_').data('id');
-        console.log(id);
+
+    var deleteResId = $('#mainDeleteButton').data('id'), deleteResName = $('#mainDeleteButton').data('name'),
+        deleteFormAction = $('#mainDeleteButton').data('action');
+    $('#deleteModalLabel').html('Edit Restaurant ' + deleteResName);
+    $('#deleteForm').attr('action', deleteFormAction);
+    $('#deleteRes').on('click', function (e) {
         e.preventDefault();
         $.ajax({
-            url: "/restaurants/" + id + "/delete",
+            url: "/restaurants/" + deleteResId + "/delete",
             method: 'post',
             success: function () {
                 console.log('Success')
                 location.reload()
             },
-            error: function() {
+            error: function () {
                 console.log('Error')
             }
         });
     });
-    $('#addRes_').on('click', function (e) {
+    $('#addRes').on('click', function (e) {
         e.preventDefault();
         $.ajax({
             url: "/restaurants/add",
@@ -42,39 +49,47 @@ $(document).ready(function () {
                 console.log('Success')
                 location.reload()
             },
-            error: function() {
+            error: function () {
                 console.log('Error')
             }
         });
     });
     // Menu Items ajaxes
-    $('#editIt_').on('click', function (e) {
-        var id = $('#editIt_').data('id'), restaurant_id = $('#editIt_').data('restaurant');
+    var $itemId = $('#mainEditButton').data('itemid'), $restId = $('#mainEditButton').data('restid'),
+        $itemName = $('#mainEditButton').data('itemname'), $editAction = $('#mainEditButton').data('action');
+    $('#editModalLabel').html('Edit item ' + $itemName)
+    $('#editItemForm').attr('action', $editAction)
+    $('#editName').attr('placeholder', $itemName)
+    $('#editIt').on('click', function (e) {
         e.preventDefault();
         $.ajax({
-            url: "/restaurants/" + restaurant_id + "/item/" + id + "/edit",
+            url: "/restaurants/" + $restId + "/item/" + $itemId + "/edit",
             method: 'post',
-            data: $('.form-signin').serialize(),
+            data: $('#editItemForm').serialize(),
             success: function () {
                 console.log('Success')
                 location.reload()
             },
-            error: function() {
+            error: function () {
                 console.log('Error')
             }
         });
     });
-    $('#deleteIt_').on('click', function (e) {
-        var id = $('#deleteIt_').data('id'), restaurant_id = $('#deleteIt_').data('restaurant');
+    var $itemDelId = $('#mainDeleteButton').data('itemid'), $restDelId = $('#mainDeleteButton').data('restid'),
+        $itemDelName = $('#mainDeleteButton').data('itemname'), $deleteAction = $('#mainDeleteButton').data('action');
+    $('#deleteModalLabel').html('Edit item ' + $itemDelName)
+    $('#deleteItemForm').attr('action', $deleteAction)
+    $('#deleteName').attr('placeholder', $itemDelName)
+    $('#deleteIt').on('click', function (e) {
         e.preventDefault();
         $.ajax({
-            url: "/restaurants/" + restaurant_id + "/item/" + id + "/delete",
+            url: "/restaurants/" + $restDelId + "/item/" + $itemDelId + "/delete",
             method: 'post',
             success: function () {
                 console.log('Success')
                 location.reload()
             },
-            error: function() {
+            error: function () {
                 console.log('Error')
             }
         });

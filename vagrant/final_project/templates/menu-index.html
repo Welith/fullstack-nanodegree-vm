@@ -25,58 +25,59 @@
                 <td>{{item.desccription}}</td>
                 <td>{{item.price}}</td>
                 <td>
-                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#editItem_{{item.id}}">Edit</button>
-                    <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteItem_{{item.id}}">Delete</button>
+                    <button class="btn btn-sm btn-primary" data-toggle="modal" id="mainEditButton"
+                        data-target="#editItem" data-itemid="{{item.id}}" data-restid="{{restaurant.id}}"
+                        data-itemname="{{item.name}}"
+                        data-action="{{url_for('editItem', restaurant_id = restaurant.id, item_id = item.id)}}">Edit</button>
+                    <button class="btn btn-sm btn-danger" data-toggle="modal" id="mainDeleteButton"
+                        data-itemid="{{item.id}}" data-restid="{{restaurant.id}}" data-itemname="{{item.name}}"
+                        data-action="{{url_for('deleteItem', restaurant_id = restaurant.id, item_id = item.id)}}"
+                        data-target="#deleteItem">Delete</button>
                 </td>
             </tr>
-            <div class="modal fade" id="editItem_{{item.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_{{item.id}}"
-                aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel_{{item.id}}">Edit Item {{item.name}}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form class="form-signin" action="{{url_for('editItem', restaurant_id = restaurant.id, item_id = item.id)}}"
-                            method="post" role="form">
-                            <div class="modal-body">
-                                <input name="name" type="text" placeholder="{{item.name}}">
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary" data-id="{{item.id}}" data-restaurant="{{restaurant.id}}"
-                                    id="editIt_{{item.id}}">Save
-                                    changes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="modal fade" id="deleteItem_{{item.id}}" tabindex="-1" role="dialog"
-                aria-labelledby="exampleModalLabel_{{item.id}}" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel_{{item.id}}">Delete Item {{item.name}}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form class="form-signin" method="post" action="{{url_for('deleteItem', restaurant_id = restaurant.id, item_id = item.id)}}" role="form">
-                            <div class="modal-body">Are you sure you want to delete this item?</div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                <button type="submit" class="btn btn-primary" data-id="{{item.id}}"  data-restaurant="{{restaurant.id}}"
-                                    id="deleteIt_{{item.id}}">Yes</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
             {% endfor %}
         </tbody>
     </table>
+</div>
+<div class="modal fade" id="editItem" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form class="form-signin" method="post" role="form" id="editItemForm">
+                <div class="modal-body">
+                    <input name="name" type="text" id="editName">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="editIt">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteItem" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form class="form-signin" method="post" role="form">
+                <div class="modal-body">Are you sure you want to delete this item?</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-primary" id="deleteIt">Yes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
