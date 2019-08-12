@@ -1,0 +1,37 @@
+
+
+/* Footer */
+
+.my-footer {
+    color: white;
+    background-color: #007bff !important;
+}
+
+/* Item listing settings */
+img {
+    width: 200px !important;
+    height: 200px !important;
+    object-fit: cover !important;
+}
+
+.card-text {
+    white-space: nowrap;
+    width: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-body {
+    text-align: center !important;
+}
+
+img.centered-img {
+    padding-top: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.inner-boxes:nth-child(n+4) {
+    padding-top: 10px;
+}
