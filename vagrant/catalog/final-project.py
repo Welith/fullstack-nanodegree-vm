@@ -1,7 +1,7 @@
 import string
 import random
 from flask import session as login_session
-from database_setup import Base, Category, CategoryItem, User
+from database_setup import Category, CategoryItem, User, db
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, asc, desc, text
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
@@ -11,15 +11,15 @@ import httplib2
 import json
 from flask import make_response
 import requests
+
+
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./testDB.db'
+db.init_app(app)
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())[
     'web']['client_id']
-
-app = Flask(__name__)
-
-engine = create_engine('sqlite:///catalogItems.db')
-Base.metadata.bind = engine
 
 ''' Helpfull user methods used for user login '''
 
@@ -241,28 +241,62 @@ def showLogin():
 @app.route('/', defaults={"page": 1})
 @app.route('/<int:page>')
 @app.route('/categories/', defaults={"page": 1})
-@app.route('/categories/<int:page>')
+@app.route('/categories/page/<int:page>')
 def showCategories(page):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
     page = page
     per_page = 6
-    categories = session.query(Category).all()
-    category_items = session.query(
-        CategoryItem).order_by(text("id DESC")).all()
-    latest_category_item = session.query(
-        CategoryItem).order_by(text("id DESC")).first()
+    categories = Category.query.all()
+    category_items = CategoryItem.query.order_by(
+        text("id DESC")).paginate(page, per_page, error_out=False)
+    latest_category_item = CategoryItem.query.order_by(text("id DESC")).first()
     return render_template("category-index.html", categories=categories, category_items=category_items,
                            latest_category_item=latest_category_item)
 
 
-@app.route('/restaurants/<int:restaurant_id>/')
-def restaurantMenu(restaurant_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-    items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id)
-    return render_template('menu-index.html', restaurant=restaurant, items=items)
+@app.route('/category/<int:category_id>/page/<int:page>', defaults={"page": 1})
+def categoryItems(category_id, page):
+    page = page
+    per_page = 6
+    categories = Category.query.all()
+    category = Category.query.filter_by(id=category_id).one()
+    latest_category_item = CategoryItem.query.order_by(text("id DESC")).first()
+    items = CategoryItem.query.filter_by(
+        category_id=category.id).paginate(page, per_page, error_out=False)
+    return render_template('category-item-index.html', category=category, items=items, categories=categories,
+                           latest_category_item=latest_category_item)
+
+
+@app.route('/category/<int:category_id>/item/<int:item_id>')
+def itemIndex(category_id, item_id):
+    categories = Category.query.all()
+    category = Category.query.filter_by(id=category_id).one()
+    latest_category_item = CategoryItem.query.order_by(text("id DESC")).first()
+    item = CategoryItem.query.filter_by(id=item_id).one()
+    return render_template('item-index.html', item=item, category=category, categories=categories,
+                           latest_category_item=latest_category_item)
+
+
+# API endpoints
+@app.route('/api/v1/catalog.json')
+def catalog_JSON():
+    catalog_items = CategoryItem.query.order_by(text('id ASC')).all()
+    catalog_categories = Category.query.order_by(text('id ASC')).all()
+    return jsonify(
+        Categories=[
+            category.serialize for category in catalog_categories], Items=[
+            item.serialize for item in catalog_items])
+
+
+@app.route('/api/v1/catalog_items/JSON')
+def catalog_items_JSON():
+    catalog_items = CategoryItem.query.order_by(text('id ASC')).all()
+    return jsonify(catalog_items=[item.serialize for item in catalog_items])
+
+
+@app.route('/api/v1/catalog_categories/JSON')
+def catalog_categories_JSON():
+    catalog_categories = Category.query.order_by(text('id ASC')).all()
+    return jsonify(catalog_categories=[categories.serialize for categories in catalog_categories])
 
 
 @app.route('/restaurants/<int:restaurant_id>/edit', methods=["POST", "GET"])

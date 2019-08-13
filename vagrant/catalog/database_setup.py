@@ -1,26 +1,29 @@
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
-from sqlalchemy import create_engine
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from passlib.apps import custom_app_context as pwd_context
-import random, string
+import random
+import string
+import os
 
 
-
-Base = declarative_base()
-
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./testDB.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 ''' Model representation of the user class '''
-class User(Base):
+
+
+class User(db.Model):
     __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    email = Column(String(120), unique=True, nullable=False, index=True)
-    username = Column(String(100), unique=True, nullable=False, index=True)
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    username = db.Column(db.String(100), unique=True, nullable=False, index=True)
 
     # Storing password as a hash as password should not be stored in the DB
-    password_hash = Column(String(64))
-    picture = Column(String(250))
+    password_hash = db.Column(db.String(64))
+    picture = db.Column(db.String(250))
 
     # Encrypt the pass
     def hash_password(self, password):
@@ -30,7 +33,6 @@ class User(Base):
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
 
-        
     """Return object data in easily serializeable format"""
     @property
     def serialize(self):
@@ -44,16 +46,17 @@ class User(Base):
 
 
 ''' Model representation of the category class '''
-class Category(Base):
+
+
+class Category(db.Model):
     __tablename__ = 'category'
-    name = Column(
-        String(80), nullable=False
+    name = db.Column(
+        db.String(80), nullable=False
     )
-    id = Column(
-        Integer, primary_key=True
+    id = db.Column(
+        db.Integer, primary_key=True
     )
 
-    
     """Return object data in easily serializeable format"""
     @property
     def serialize(self):
@@ -64,27 +67,28 @@ class Category(Base):
 
 
 ''' Model representation of the category_item class '''
-class CategoryItem(Base):
-    __tablename__ = 'category_item'
-    title = Column(
-        String(80), nullable=False
-    )
-    id = Column(
-        Integer, primary_key=True
-    )
-    description = Column(String(250))
-    price = Column(String(8))
-    picture = Column(String(250))
-    category_id = Column(
-        Integer, ForeignKey('category.id')
-    )
-    category = relationship(Category)
-    user_id = Column(
-        Integer, ForeignKey('user.id')
-    )
-    user = relationship(User)
 
-    
+
+class CategoryItem(db.Model):
+    __tablename__ = 'category_item'
+    title = db.Column(
+        db.String(80), nullable=False
+    )
+    id = db.Column(
+        db.Integer, primary_key=True
+    )
+    description = db.Column(db.String(250))
+    price = db.Column(db.String(8))
+    picture = db.Column(db.String(250))
+    category_id = db.Column(
+        db.Integer, db.ForeignKey('category.id')
+    )
+    category = db.relationship(Category)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey('user.id')
+    )
+    user = db.relationship(User)
+
     """Return object data in easily serializeable format"""
     @property
     def serialize(self):
@@ -97,6 +101,4 @@ class CategoryItem(Base):
             'picture': self.picture
         }
 
-
-engine = create_engine('sqlite:///catalogItems.db')
-Base.metadata.create_all(engine)
+db.create_all()
