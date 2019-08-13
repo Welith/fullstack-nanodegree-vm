@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="{{url_for('static', filename='css/user_style.css')}}" type="text/css">
+    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
+    </script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
@@ -31,7 +33,7 @@
         </a>
         <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item active">
-                <button class='btn btn-lg btn-danger'>Login</button>
+                    <a href="/login"><button class='btn btn-lg btn-danger'>Login</button></a>
             </li>
         </ul>
     </nav>
@@ -66,10 +68,12 @@
                         <div class="card-header bg-success text-white text-uppercase">Last product</div>
                         <div class="card-body" style="text-align: center;">
                             <img class="img-fluid" src="{{latest_category_item.picture}}" />
-                            <h5 class="card-title"><a href="{{url_for('itemIndex', category_id = latest_category_item.category_id, item_id = latest_category_item.id)}}" title="View Product">{{latest_category_item.title}}</a>
+                            <h5 class="card-title"><a
+                                    href="{{url_for('itemIndex', category_id = latest_category_item.category_id, item_id = latest_category_item.id)}}"
+                                    title="View Product">{{latest_category_item.title}}</a>
                             </h5>
                             <p class="card-text">{{latest_category_item.description}}</p>
-                            <p class="bloc_left_price">{{latest_category_item.price}}</p>
+                            <p class="bloc_left_price">${{latest_category_item.price}}</p>
                         </div>
                     </div>
                 </div>

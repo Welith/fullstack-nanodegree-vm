@@ -1,69 +1,15 @@
 $(document).ready(function () {
-    // Restaurant ajaxes
-    var resId = $('#mainEditButton').data('id'), resName = $('#mainEditButton').data('name'),
-        formAction = $('#mainEditButton').data('action');
-    $('#editModalLabel').html('Edit Restaurant ' + resName);
-    $('#editForm').attr('action', formAction);
-    $('#name').attr('placeholder', resName);
-    $('#editRes').on('click', function (e) {
-        e.preventDefault();
-        $.ajax({
-            url: "/restaurants/" + resId + "/edit",
-            method: 'post',
-            data: $('#editForm').serialize(),
-            success: function () {
-                console.log('Success')
-                //location.reload()
-            },
-            error: function () {
-                console.log('Error')
-            }
-        });
-    });
 
-    var deleteResId = $('#mainDeleteButton').data('id'), deleteResName = $('#mainDeleteButton').data('name'),
-        deleteFormAction = $('#mainDeleteButton').data('action');
-    $('#deleteModalLabel').html('Edit Restaurant ' + deleteResName);
-    $('#deleteForm').attr('action', deleteFormAction);
-    $('#deleteRes').on('click', function (e) {
-        e.preventDefault();
-        $.ajax({
-            url: "/restaurants/" + deleteResId + "/delete",
-            method: 'post',
-            success: function () {
-                console.log('Success')
-                location.reload()
-            },
-            error: function () {
-                console.log('Error')
-            }
-        });
-    });
-    $('#addRes').on('click', function (e) {
-        e.preventDefault();
-        $.ajax({
-            url: "/restaurants/add",
-            method: 'post',
-            data: $('.form-new').serialize(),
-            success: function () {
-                console.log('Success')
-                location.reload()
-            },
-            error: function () {
-                console.log('Error')
-            }
-        });
-    });
     // Menu Items ajaxes
-    var $itemId = $('#mainEditButton').data('itemid'), $restId = $('#mainEditButton').data('restid'),
-        $itemName = $('#mainEditButton').data('itemname'), $editAction = $('#mainEditButton').data('action');
+    var $itemId = $('#mainEditButton').data('itemid'), $itemName = $('#mainEditButton').data('itemname'), 
+    $editAction = $('#mainEditButton').data('action'), $categoryId = $('#mainEditButton').data('catid');
     $('#editModalLabel').html('Edit item ' + $itemName)
     $('#editItemForm').attr('action', $editAction)
     $('#editName').attr('placeholder', $itemName)
     $('#editIt').on('click', function (e) {
         e.preventDefault();
         $.ajax({
-            url: "/restaurants/" + $restId + "/item/" + $itemId + "/edit",
+            url: "/categories/" + $categoryId + "/items/" + $itemId + "/edit",
             method: 'post',
             data: $('#editItemForm').serialize(),
             success: function () {
@@ -97,4 +43,51 @@ $(document).ready(function () {
     $(".alert-success").fadeTo(2000, 1000).slideUp(1000, function () {
         $(".alert-success").slideUp(1000);
     });
+    // GOOGLE SIGN IN
+    function start() {
+        gapi.load('auth2', function () {
+            auth2 = gapi.auth2.init({
+                client_id: '288544481503-bdb12i834oanh7pk927bch6mi9jniage.apps.googleusercontent.com',
+                // Scopes to request in addition to 'profile' and 'email'
+                //scope: 'additional_scope'
+            });
+        });
+    }
+    start();
+
+    $('#signinButton').click(function () {
+        // signInCallback defined in step 6.
+        auth2.grantOfflineAccess().then(signInCallback);
+    });
+    function signInCallback(authResult) {
+        if (authResult['code']) {
+            // Hide the sign-in button now that the user is authorized
+            $('#signinButton').attr('style', 'display: none');
+            $('#fbButton').attr('style', 'display: none');
+            var state = $('#signinButton').data('state');
+            // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+            $.ajax({
+                type: 'POST',
+                url: '/gconnect?state=' + state,
+                processData: false,
+                data: authResult['code'],
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function (result) {
+                    // Handle or verify the server response if necessary.
+                    if (result) {
+                        $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
+                        setTimeout(function () {
+                            window.location.href = "/categories/";
+                        }, 4000);
+
+                    } else if (authResult['error']) {
+                        console.log('There was an error: ' + authResult['error']);
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+                }
+
+            });
+        }
+    }
 });

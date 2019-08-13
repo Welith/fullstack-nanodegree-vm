@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'layout_not_logged.html' %}
 {% block title %}Categories{% endblock %}
 {% block head %}
 {{ super() }}
@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="col">
-                        <p class="btn btn-block btn-danger">{{item.price}}</p>
+                        <p class="btn btn-block btn-danger">${{item.price}}</p>
                     </div>
                 </div>
             </div>

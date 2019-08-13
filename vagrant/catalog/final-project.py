@@ -27,20 +27,20 @@ CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())[
 def createUser(login_session):
     newUser = User(username=login_session['username'],
                    email=login_session['email'], picture=login_session['picture'])
-    session.add(newUser)
-    session.commit()
-    user = session.query(User).filter_by(email=login_session['email']).one()
+    db.session.add(newUser)
+    db.session.commit()
+    user = User.query.filter_by(email=login_session['email']).one()
     return user.id
 
 
 def getUserInfo(user_id):
-    user = session.query(User).filter_by(id=user_id).one()
+    user = User.query.filter_by(id=user_id).one()
     return user
 
 
 def getUserID(email):
     try:
-        user = session.query(User).filter_by(email=email).one()
+        user = User.query.filter_by(email=email).one()
         return user.id
     except:
         return None
@@ -125,6 +125,12 @@ def fbdisconnect():
         facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
+    del login_session['username']
+    del login_session['email']
+    del login_session['facebook_id']
+    del login_session['access_token']
+    del login_session['user_id']
+    del login_session['picture']
     return "you have been logged out"
 
 
@@ -228,10 +234,20 @@ def gdisconnect():
         return response
 
 
+@app.route('/logout')
+def logout():
+    if 'facebook_id' in login_session.keys():
+        fbdisconnect()
+    if 'gplus_id' in login_session.keys():
+        gdisconnect()
+    flash('You have successfuly logged out!')
+    return redirect(url_for('showLogin'))
+
+
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase +
-                                  string.ascii_lowercase) for x in xrange(32))
+                                  string.digits) for x in xrange(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
@@ -249,11 +265,15 @@ def showCategories(page):
     category_items = CategoryItem.query.order_by(
         text("id DESC")).paginate(page, per_page, error_out=False)
     latest_category_item = CategoryItem.query.order_by(text("id DESC")).first()
-    return render_template("category-index.html", categories=categories, category_items=category_items,
+    if 'username' not in login_session:
+        flash("Please log in to be able to add,edit or delete items.")
+        return render_template("category-index_not_logged.html", categories=categories, category_items=category_items,
+                               latest_category_item=latest_category_item)
+    return render_template("category-index_logged.html", categories=categories, category_items=category_items,
                            latest_category_item=latest_category_item)
 
 
-@app.route('/category/<int:category_id>/page/<int:page>', defaults={"page": 1})
+@app.route('/categories/<int:category_id>/pages/<int:page>', defaults={"page": 1})
 def categoryItems(category_id, page):
     page = page
     per_page = 6
@@ -262,23 +282,42 @@ def categoryItems(category_id, page):
     latest_category_item = CategoryItem.query.order_by(text("id DESC")).first()
     items = CategoryItem.query.filter_by(
         category_id=category.id).paginate(page, per_page, error_out=False)
-    return render_template('category-item-index.html', category=category, items=items, categories=categories,
+    if 'username' not in login_session:
+        return render_template('category-item-index_not_logged.html', category=category, items=items, categories=categories,
+                               latest_category_item=latest_category_item)
+    return render_template('category-item-index_logged.html', category=category, items=items, categories=categories,
                            latest_category_item=latest_category_item)
 
 
-@app.route('/category/<int:category_id>/item/<int:item_id>')
+@app.route('/categories/<int:category_id>/items/<int:item_id>')
 def itemIndex(category_id, item_id):
     categories = Category.query.all()
     category = Category.query.filter_by(id=category_id).one()
     latest_category_item = CategoryItem.query.order_by(text("id DESC")).first()
     item = CategoryItem.query.filter_by(id=item_id).one()
-    return render_template('item-index.html', item=item, category=category, categories=categories,
+    if 'username' not in login_session:
+        return render_template('item-index_not_logged.html', item=item, category=category, categories=categories,
+                               latest_category_item=latest_category_item)
+    return render_template('item-index_logged.html', item=item, category=category, categories=categories,
                            latest_category_item=latest_category_item)
 
+
+@app.route('/categories/<int:category_id>/items/<int:item_id>/edit', methods=['POST', 'GET'])
+def editItem(category_id, item_id):
+    if request.method == "POST":
+        item = CategoryItem.query.filter_by(id=item_id).one()
+        item.name = request.form['title']
+        item.description = request.form['description']
+        item.price = request.form['price']
+        item.category_id = request.form['category_id']
+        db.session.commit()
+        flash('Item Edited!')
+        return redirect(url_for('categoryItems', category_id=category_id, item_id=item_id))
 
 # API endpoints
 @app.route('/api/v1/catalog.json')
 def catalog_JSON():
+    '''All items and categories from the catalog as a JSON'''
     catalog_items = CategoryItem.query.order_by(text('id ASC')).all()
     catalog_categories = Category.query.order_by(text('id ASC')).all()
     return jsonify(
@@ -289,14 +328,30 @@ def catalog_JSON():
 
 @app.route('/api/v1/catalog_items/JSON')
 def catalog_items_JSON():
+    '''All items from the catalog as a JSON'''
     catalog_items = CategoryItem.query.order_by(text('id ASC')).all()
     return jsonify(catalog_items=[item.serialize for item in catalog_items])
 
 
 @app.route('/api/v1/catalog_categories/JSON')
 def catalog_categories_JSON():
+    '''All categories from the catalog as a JSON'''
     catalog_categories = Category.query.order_by(text('id ASC')).all()
     return jsonify(catalog_categories=[categories.serialize for categories in catalog_categories])
+
+
+@app.route('/api/v1/catalog_category/<int:category_id>/JSON')
+def catalog_category_JSON(category_id):
+    '''A specific category from the catalog as a JSON'''
+    catalog_category = Category.query.filter_by(id=category_id).one()
+    return jsonify(catalog_category=[catalog_category.serialize])
+
+
+@app.route('/api/v1/catalog_item/<int:item_id>/JSON')
+def catalog_item_JSON(item_id):
+    '''A specific item from the catalog as a JSON'''
+    catalog_item = CategoryItem.query.filter_by(id=item_id).one()
+    return jsonify(catalog_item=[catalog_item.serialize])
 
 
 @app.route('/restaurants/<int:restaurant_id>/edit', methods=["POST", "GET"])
@@ -336,22 +391,6 @@ def addRestaurant():
         session.commit()
         flash('Restaurant added')
         return redirect(url_for('showRestaurants'))
-
-
-# Menu Item related actions
-@app.route('/restaurants/<int:restaurant_id>/item/<int:item_id>/edit', methods=["POST", "GET"])
-def editItem(restaurant_id, item_id):
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    if request.method == "POST":
-        item = session.query(
-            MenuItem).filter_by(id=item_id).one()
-        item.name = request.form['name']
-        session.commit()
-        flash('Item Edited')
-        restaurant = session.query(
-            Restaurant).filter_by(id=restaurant_id).one()
-        return redirect(url_for('restaurantMenu', restaurant_id=restaurant.id))
 
 
 @app.route('/restaurants/<int:restaurant_id>/item/<int:item_id>/delete', methods=["POST", "GET"])

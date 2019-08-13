@@ -5,11 +5,23 @@
     background-color: #007bff !important;
 }
 
-html,body,#page, header { height:100%;}
+html, body, #page, header {
+    height: 100%;
+}
 
-#page { position:relative;}
-#content { padding-bottom:130px;} /* FOOTER HEIGHT */
-footer {  bottom:0;}
+#page {
+    position: relative;
+}
+
+#content {
+    padding-bottom: 130px;
+}
+
+/* FOOTER HEIGHT */
+
+footer {
+    bottom: 0;
+}
 
 /* Item listing settings */
 
@@ -53,6 +65,43 @@ img.centered-img {
 #first {
     float: left;
 }
+
 #second {
     float: left;
+}
+
+/* Login */
+
+#login {
+    font-family: Arial;
+    background-color: #5bc0de;
+    padding: 50px;
+}
+
+.login {
+    margin: 20px auto;
+    width: 300px;
+}
+
+.login-screen {
+    background-color: #FFF;
+    padding: 20px;
+    border-radius: 5px
+}
+
+.app-title {
+    text-align: center;
+    color: #777;
+}
+
+.login-form {
+    text-align: center;
+}
+
+.control-group {
+    margin-bottom: 10px;
+}
+
+.flex-label {
+    display: flex !important;
 }
