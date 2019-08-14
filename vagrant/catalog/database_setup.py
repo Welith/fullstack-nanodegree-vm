@@ -19,7 +19,8 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    username = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    username = db.Column(db.String(100), unique=True,
+                         nullable=False, index=True)
 
     # Storing password as a hash as password should not be stored in the DB
     password_hash = db.Column(db.String(64))
@@ -100,5 +101,6 @@ class CategoryItem(db.Model):
             'user_id': self.user_id,
             'picture': self.picture
         }
+
 
 db.create_all()

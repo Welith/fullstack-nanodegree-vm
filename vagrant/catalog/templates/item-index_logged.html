@@ -22,10 +22,18 @@
 
                     <div class="col">
                         <p class="btn btn-block btn-danger">${{item.price}}</p>
-
                         <button class="btn btn-sm btn-primary" data-toggle="modal" id="mainEditButton"
-                            data-target="#editItem" data-itemid="{{item.id}}" data-catid="{{item.category_id}}" data-itemname="{{item.title}}"
-                            data-action="{{url_for('editItem', category_id = item.category_id, item_id=item.id)}}">Edit</button>
+                            data-target="#editItem" data-itemid="{{item.id}}" data-catid="{{item.category_id}}"
+                            data-itemname="{{item.title}}"
+                            data-action="{{url_for('editItem', category_id = item.category_id, item_id=item.id)}}"
+                            data-redirect='{{url_for("categoryItems", category_id=item.category_id, page=1)}}'>Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger" data-toggle="modal" id="mainDeleteButton"
+                            data-target="#deleteItem" data-itemid="{{item.id}}" data-catid="{{item.category_id}}"
+                            data-itemname="{{item.title}}"
+                            data-action="{{url_for('deleteItem', category_id = item.category_id, item_id=item.id)}}"
+                            data-redirect='{{url_for("categoryItems", category_id=item.category_id, page=1)}}'>Delete
+                        </button>
                     </div>
                 </div>
             </div>
@@ -44,32 +52,57 @@
             <form class="form-signin" method="post" role="form" id="editItemForm">
                 <div class="modal-body">
                     <div>
-                        <label class="flex-label" for="title">Name:</label>
-                        <input class="form-control" name="title" type="text" id="editName">
+                        <label class="flex-label" for="title">Name: *</label>
+                        <input class="form-control" name="title" type="text" id="editName" required>
                     </div>
                     </br>
                     <div>
-                        <label class="flex-label" for="description">Description:</label>
-                        <textarea class="form-control" name="description" id="editDescription"></textarea>
+                        <label class="flex-label" for="description">Description: *</label>
+                        <textarea class="form-control" name="description" id="editDescription" required></textarea>
                     </div>
                     </br>
                     <div>
-                        <label class="flex-label" for="price">Price:</label>
-                        <input class="form-control" name="price" type="number" step=".01" min="0" id="editPrice">
+                        <label class="flex-label" for="price">Price: *</label>
+                        <input class="form-control" name="price" type="number" step=".01" min="0" id="editPrice"
+                            required>
                     </div>
                     </br>
                     <div>
-                        <label class="flex-label" for="category_id">Category:</label>
-                        <select class="form-control" name="category_id" id="editCategory">
+                        <label class="flex-label" for="category_id">Category: *</label>
+                        <select class="form-control" name="category_id" id="editCategory" required>
                             {% for category in categories %}
                             <option value="{{category.id}}">{{category.name}}</option>
                             {%endfor%}
                         </select>
                     </div>
+                    </br>
+                    <div>
+                        <label class="flex-label" for="picture">Picture URL: *</label>
+                        <input class="form-control" name="picture" type="text" id="editPicture" required
+                            value="{{item.picture}}">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary" id="editIt">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteItem" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form class="form-signin" method="post" role="form" id="deleteItemForm">
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-primary" id="deleteIt">Yes</button>
                 </div>
             </form>
         </div>

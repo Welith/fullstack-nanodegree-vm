@@ -31,9 +31,12 @@
         <a class="navbar-brand" href="/">
             <h1>My Sports Shop</h1>
         </a>
+        <button class="btn btn-lg btn-success" data-toggle="modal" id="mainAddButton" data-target="#addItem"
+            data-action="{{url_for('addItem')}}" data-redirect='{{url_for("showCategories", page=1)}}'>Add Item</button>
         <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item active">
-                <a href="/logout"><button class='btn btn-lg btn-danger'>Logout</button></a>
+                <button class='btn btn-lg btn-danger' data-toggle="modal" id="mainLogoutButton" data-target="#logout"
+                    data-action="{{url_for('logout')}}" data-redirect="{{url_for('showLogin')}}">Logout</button>
             </li>
         </ul>
     </nav>
@@ -73,12 +76,79 @@
                                     title="View Product">{{latest_category_item.title}}</a>
                             </h5>
                             <p class="card-text">{{latest_category_item.description}}</p>
-                            <p class="bloc_left_price">${{latest_category_item.price}}</p>
+                            <p class="bloc_left_price btn btn-danger">${{latest_category_item.price}}</p>
                         </div>
                     </div>
                 </div>
                 {% block content %}
                 {% endblock %}
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addItem" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Add new item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="form-signin" method="post" role="form" id="addCatItemForm">
+                    <div class="modal-body">
+                        <div>
+                            <label class="flex-label" for="title">Name: *</label>
+                            <input class="form-control" name="title" type="text" id="addName">
+                        </div>
+                        </br>
+                        <div>
+                            <label class="flex-label" for="description">Description: *</label>
+                            <textarea class="form-control" name="description" id="addDescription"></textarea>
+                        </div>
+                        </br>
+                        <div>
+                            <label class="flex-label" for="price">Price: *</label>
+                            <input class="form-control" name="price" type="number" step=".01" min="0" id="addPrice">
+                        </div>
+                        </br>
+                        <div>
+                            <label class="flex-label" for="category_id">Category: *</label>
+                            <select class="form-control" name="category_id" id="addCategory">
+                                {% for category in categories %}
+                                <option value="{{category.id}}">{{category.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </div>
+                        </br>
+                        <div>
+                            <label class="flex-label" for="picture">Picture URL: *</label>
+                            <input class="form-control" name="picture" type="text" id="addPicture" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="addIt">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="logout" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Are you sure you want to logout?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form class="form-signin" method="post" role="form" id="logoutForm">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                        <button type="submit" class="btn btn-primary" id="disconnect">Yes</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -1,45 +1,82 @@
 $(document).ready(function () {
 
-    // Menu Items ajaxes
-    var $itemId = $('#mainEditButton').data('itemid'), $itemName = $('#mainEditButton').data('itemname'), 
-    $editAction = $('#mainEditButton').data('action'), $categoryId = $('#mainEditButton').data('catid');
+    // Edit item ajax
+    var $itemName = $('#mainEditButton').data('itemname'),
+        $editAction = $('#mainEditButton').data('action'),
+        $editRedirect = $('#mainEditButton').data('redirect');
     $('#editModalLabel').html('Edit item ' + $itemName)
     $('#editItemForm').attr('action', $editAction)
-    $('#editName').attr('placeholder', $itemName)
     $('#editIt').on('click', function (e) {
         e.preventDefault();
         $.ajax({
-            url: "/categories/" + $categoryId + "/items/" + $itemId + "/edit",
+            url: $editAction,
             method: 'post',
             data: $('#editItemForm').serialize(),
             success: function () {
                 console.log('Success')
-                location.reload()
+                location.href = $editRedirect
             },
             error: function () {
                 console.log('Error')
             }
         });
     });
-    var $itemDelId = $('#mainDeleteButton').data('itemid'), $restDelId = $('#mainDeleteButton').data('restid'),
-        $itemDelName = $('#mainDeleteButton').data('itemname'), $deleteAction = $('#mainDeleteButton').data('action');
-    $('#deleteModalLabel').html('Edit item ' + $itemDelName)
-    $('#deleteItemForm').attr('action', $deleteAction)
-    $('#deleteName').attr('placeholder', $itemDelName)
+    // Logout ajax
+    var $logoutAction = $('#mainLogoutButton').data('action'), $logoutRedirect = $('#mainLogoutButton').data('redirect');
+    $('#logoutForm').attr('action', $logoutAction);
+    $('#disconnect').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: $logoutAction,
+            method: "POST",
+            success: function () {
+                console.log('Success')
+                location.href = $logoutRedirect
+            },
+            error: function () {
+                console.log('Error')
+            }
+        })
+    });
+    // Add item ajax
+    var $addAction = $('#mainAddButton').data('action'),
+        $addRedirect = $('#mainAddButton').data('redirect');
+    $('#addCatItemForm').attr('action', $addAction);
+    $('#addIt').on('click', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: $addAction,
+            method: "POST",
+            data: $('#addCatItemForm').serialize(),
+            success: function () {
+                console.log('Success')
+                location.href = $addRedirect
+            },
+            error: function () {
+                console.log('Error')
+            }
+        })
+    })
+    // Delete Item Ajax
+    var $deleteAction = $('#mainDeleteButton').data('action'),
+        $deleteRedirect = $('#mainDeleteButton').data('redirect'),
+        $deleteName = $('#mainDeleteButton').data('itemname');
+    $('#deleteItemForm').attr('action', $deleteAction);
+    $('#deleteModalLabel').html('Are you sure you want to delete ' + $deleteName + "?")
     $('#deleteIt').on('click', function (e) {
         e.preventDefault();
         $.ajax({
-            url: "/restaurants/" + $restDelId + "/item/" + $itemDelId + "/delete",
-            method: 'post',
+            url: $deleteAction,
+            method: 'POST',
             success: function () {
                 console.log('Success')
-                location.reload()
+                location.href = $deleteRedirect
             },
             error: function () {
                 console.log('Error')
             }
-        });
-    });
+        })
+    })
     $(".alert-success").fadeTo(2000, 1000).slideUp(1000, function () {
         $(".alert-success").slideUp(1000);
     });
@@ -52,8 +89,9 @@ $(document).ready(function () {
                 //scope: 'additional_scope'
             });
         });
-    }
+    };
     start();
+
 
     $('#signinButton').click(function () {
         // signInCallback defined in step 6.
